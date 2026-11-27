@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frontiera efficiente in Excel: come calcolarla e usarla per ribilanciare il tuo portafoglio (esempio con i numeri) — GIMSO</title>
+<meta name="description" content="Se hai due, cinque o dieci ETF in portafoglio, prima o poi ti fai la domanda: i pesi che ho scelto hanno senso, o li ho messi a sentimento? Il modello med…">
+<link rel="canonical" href="https://lollo3rd.github.io/gimso/articles/frontiera-efficiente-in-excel-come-calcolarla-e-usarla-per.html">
+<style>body{margin:0;background:#F5F2E9;color:#142F34;font:18px/1.65 system-ui,-apple-system,'Segoe UI',sans-serif}main{max-width:700px;margin:0 auto;padding:32px 16px 64px}header a{color:#142F34;font-weight:800;text-decoration:none;letter-spacing:.04em}h1{font-size:1.9rem;line-height:1.2;margin:24px 0 6px}h2{font-size:1.3rem;margin:32px 0 8px}h3,h4{font-size:1.1rem;margin:24px 0 6px}a{color:#176A61}.muted{color:#52686A;font-size:.92rem}code{background:#E8E4D8;padding:1px 4px;border-radius:4px}li{margin:4px 0}footer{margin-top:48px;border-top:1px solid #D5DFDA;padding-top:12px}.table{overflow-x:auto}table{border-collapse:collapse;font-size:.95rem;margin:12px 0}th,td{border-bottom:1px solid #D5DFDA;padding:6px 10px;text-align:left}th{background:#E8E4D8}</style>
+</head>
+<body>
+<main>
+<header><a href="https://lollo3rd.github.io/gimso/">GIMSO</a></header>
+<h1>Frontiera efficiente in Excel: come calcolarla e usarla per ribilanciare il tuo portafoglio (esempio con i numeri)</h1>
+<p class="muted">November 27, 2026</p>
+<p>Se hai due, cinque o dieci ETF in portafoglio, prima o poi ti fai la domanda: <em>i pesi che ho scelto hanno senso, o li ho messi a sentimento?</em> Il modello media-varianza di Markowitz è il modo più classico per dare a questa domanda una risposta numerica. In questo articolo lo costruiamo in Excel passo passo, con un esempio a due titoli che puoi rifare a mano e verificare, e vediamo come trasformare il risultato in una decisione concreta: cosa aumentare, cosa ridurre, cosa lasciare stare.</p>
+<p>Premessa onesta: il modello non prevede il futuro. Usa rendimenti e rischi stimati dal passato, quindi è uno strumento per ragionare in modo disciplinato sui tuoi numeri, non una consulenza finanziaria.</p>
+<h3>1. Cosa serve davvero: tre ingredienti</h3>
+<p>Per ogni titolo o ETF ti servono:</p>
+<ol><li><strong>Rendimento atteso annuo</strong> (μ), stimato dalla media dei rendimenti storici.</li><li><strong>Volatilità annua</strong> (σ), cioè la deviazione standard dei rendimenti.</li><li><strong>Covarianza</strong> (o correlazione) con ogni altro titolo: è l'ingrediente che rende utile la diversificazione.</li></ol>
+<p>In Excel, partendo dai prezzi:</p>
+<ul><li>Scarica i prezzi di <strong>chiusura rettificata</strong> (Adjusted Close), non la chiusura semplice: quella rettificata incorpora dividendi e split. Con la chiusura semplice un ETF a distribuzione sembra rendere meno di quanto rende davvero.</li><li>Rendimento logaritmico per ogni periodo: <code>=LN(B3/B2)</code>.</li><li>Media annualizzata: <code>=MEDIA(C3:C158)*52</code> per dati settimanali (×12 per mensili).</li><li>Volatilità annualizzata: <code>=DEV.ST.C(C3:C158)*RADQ(52)</code>.</li><li>Covarianza annualizzata tra due titoli: <code>=COVARIANZA.C(C3:C158;D3:D158)*52</code>.</li></ul>
+<p>Con 5 titoli la matrice di covarianza è una tabella 5×5: sulla diagonale ci sono le varianze, fuori diagonale le covarianze.</p>
+<h3>2. Un esempio a due ETF che puoi verificare a mano</h3>
+<p>Prendiamo due ETF ipotetici, con numeri tondi scelti per l'esempio (non sono dati di mercato):</p>
+<div class="table"><table><thead><tr><th></th><th>Rendimento atteso</th><th>Volatilità</th></tr></thead><tbody><tr><td>ETF azionario globale</td><td>7,0%</td><td>16,0%</td></tr><tr><td>ETF obbligazionario</td><td>3,0%</td><td>5,0%</td></tr></tbody></table></div>
+<p>Correlazione tra i due: 0,10. Quindi la covarianza è 0,10 × 0,16 × 0,05 = 0,0008.</p>
+<p>Per un portafoglio con peso <em>w</em> sull'azionario e <em>(1 − w)</em> sull'obbligazionario:</p>
+<ul><li>Rendimento = w × 7% + (1 − w) × 3%</li><li>Varianza = w² × 0,16² + (1 − w)² × 0,05² + 2 × w × (1 − w) × 0,0008</li><li>Volatilità = radice quadrata della varianza</li></ul>
+<h4>Il classico 60/40</h4>
+<p>Con w = 60%:</p>
+<ul><li>Rendimento = 0,6 × 7% + 0,4 × 3% = <strong>5,4%</strong></li><li>Varianza = 0,36 × 0,0256 + 0,16 × 0,0025 + 2 × 0,6 × 0,4 × 0,0008 = 0,009216 + 0,0004 + 0,000384 = 0,0100</li><li>Volatilità = <strong>10,0%</strong></li></ul>
+<h4>Il portafoglio a minima varianza</h4>
+<p>Con due titoli esiste una formula chiusa per il peso che minimizza il rischio:</p>
+<p>w* = (σ₂² − cov) / (σ₁² + σ₂² − 2·cov) = (0,0025 − 0,0008) / (0,0256 + 0,0025 − 0,0016) = 0,0017 / 0,0265 ≈ <strong>6,4%</strong> sull'azionario.</p>
+<p>Risultato: rendimento <strong>3,26%</strong>, volatilità <strong>4,89%</strong>.</p>
+<p>Guarda bene questo numero: la volatilità è <em>più bassa</em> di quella del 100% obbligazionario (5,0%), e il rendimento è più alto (3,26% contro 3,0%). Aggiungere un po' di un titolo molto più rischioso ha <em>ridotto</em> il rischio totale. È la diversificazione in un solo numero, ed è il motivo per cui la covarianza conta più della volatilità dei singoli titoli.</p>
+<h4>Il portafoglio con il miglior rapporto rendimento/rischio (Max Sharpe)</h4>
+<p>Fissiamo un tasso privo di rischio del 2%. L'indice di Sharpe è (rendimento − 2%) / volatilità.</p>
+<ul><li>60/40: (5,4% − 2%) / 10,0% = <strong>0,34</strong></li><li>100% obbligazionario: (3% − 2%) / 5% = 0,20</li></ul>
+<p>Facendo variare w da 0% a 100% (in Excel basta una colonna di pesi da 0 a 1 con passo 0,01, oppure il Risolutore), il massimo si trova intorno a <strong>w ≈ 35,5%</strong> sull'azionario: rendimento 4,41%, volatilità 6,77%, Sharpe <strong>0,356</strong>.</p>
+<p>In questo esempio la differenza di Sharpe con il 60/40 è piccola (0,356 contro 0,34). È un risultato utile anche così: ti dice che, <em>con queste stime</em>, il 60/40 non è lontano dall'ottimo, e che la scelta tra i due è soprattutto una questione di quanto rischio vuoi prendere, non di efficienza.</p>
+<h3>3. Dalla formula alla frontiera: cosa cambia con 5 o più titoli</h3>
+<p>Con due titoli ogni rendimento si ottiene con un solo portafoglio, quindi la "frontiera" è semplicemente la curva delle combinazioni. Con tre o più titoli le cose cambiano: per lo stesso rendimento esistono infinite combinazioni, e quasi tutte hanno più rischio del necessario. La <strong>frontiera efficiente</strong> è l'insieme dei portafogli che, per ogni livello di rendimento, hanno la volatilità minima.</p>
+<p>In Excel la si costruisce in due modi:</p>
+<p><strong>Con il Risolutore (vincoli realistici).</strong> Per ogni rendimento obiettivo:<br>- Cella obiettivo: la volatilità del portafoglio, calcolata con <code>=RADQ(MATR.PRODOTTO(MATR.TRASPOSTA(w);MATR.PRODOTTO(Sigma;w)))</code> (inserita come formula matrice con Ctrl+Maiusc+Invio nelle versioni senza array dinamici).<br>- Da: Min.<br>- Celle variabili: i pesi.<br>- Vincoli: somma dei pesi = 1; pesi ≥ 0 (niente vendite allo scoperto); rendimento del portafoglio = obiettivo.<br>- Metodo: GRG non lineare.</p>
+<p>Ripeti per 15–20 rendimenti obiettivo e hai la curva. È preciso ma lento: ogni cambio dei prezzi richiede di rilanciare il Risolutore 20 volte (o una macro che lo faccia).</p>
+<p><strong>In forma chiusa (aggiornamento istantaneo).</strong> Se accetti di permettere pesi negativi, la frontiera ha una formula esplicita basata sull'inversa della matrice di covarianza (<code>MATR.INVERSA</code>). Si definiscono tre scalari, A = 1ᵀΣ⁻¹1, B = 1ᵀΣ⁻¹μ, C = μᵀΣ⁻¹μ, e la varianza minima per un rendimento r è (A·r² − 2B·r + C) / (A·C − B²). Il vantaggio: il grafico si ricalcola da solo a ogni modifica dei dati. Lo svantaggio: senza il vincolo pesi ≥ 0 alcuni punti possono richiedere posizioni corte, quindi va usata come mappa, mentre i portafogli da implementare davvero vanno risolti con i vincoli.</p>
+<h3>4. Il passo che quasi tutti saltano: dal portafoglio ottimo al ribilanciamento</h3>
+<p>Il risultato del modello è un vettore di pesi. Ma tu hai già un portafoglio. La domanda pratica è: <em>quanto devo spostare, e vale la pena farlo?</em></p>
+<p>Tre regole che rendono il risultato utilizzabile:</p>
+<ol><li><strong>Confronta pesi attuali e pesi ottimi titolo per titolo.</strong> Una colonna "scostamento" = peso ottimo − peso attuale.</li><li><strong>Usa una soglia di ribilanciamento.</strong> Le stime di μ sono rumorose: piccoli cambi nei dati spostano i pesi ottimi di qualche punto. Se lo scostamento è sotto una soglia (per esempio 5 punti percentuali), non tocchi nulla. Così eviti commissioni e tasse per inseguire il rumore.</li><li><strong>Traduci in azioni.</strong> Per ogni titolo: aumenta, riduci, mantieni. In Excel basta un <code>SE</code> annidato sullo scostamento e sulla soglia.</li></ol>
+<p>Nel nostro esempio a due ETF, chi oggi ha il 60/40 e volesse spostarsi sul Max Sharpe dovrebbe ridurre l'azionario di circa 24 punti. Con la soglia al 5% l'indicazione sarebbe "riduci"; ma vista la piccola differenza di Sharpe, è una decisione che dipende più dalla tolleranza al rischio che dall'efficienza.</p>
+<h3>5. I limiti da conoscere prima di fidarti dei numeri</h3>
+<ul><li><strong>I rendimenti attesi sono la stima più fragile.</strong> Tre anni di dati possono raccontare una storia molto diversa dai tre anni successivi. Il portafoglio a minima varianza, che non usa i rendimenti attesi, è di solito più stabile del Max Sharpe.</li><li><strong>Il modello tende a concentrare.</strong> Senza vincoli massimi per titolo, l'ottimizzatore può mettere il 60% su un solo titolo che è andato bene nel periodo. Un tetto per titolo (per esempio 30–40%) è una scelta ragionevole.</li><li><strong>Non considera costi, tasse e benchmark.</strong> È media-varianza classica.</li><li><strong>Non è una previsione.</strong> Ti dice qual era il portafoglio più efficiente <em>rispetto ai dati che gli hai dato</em>.</li></ul>
+<h3>Se non vuoi costruirlo da zero</h3>
+<p>Tutto quello che c'è in questo articolo l'ho messo in un file Excel in italiano, con covarianze, Risolutore già impostato per Max Sharpe, Minima Varianza e Target Rendimento, frontiera in forma chiusa che si aggiorna da sola, e una macro che genera le indicazioni di ribilanciamento con soglia configurabile. Include una guida PDF di 12 pagine e lo script Python che genera il file. È a pagamento: <a href="https://lollo3rd.gumroad.com/l/portfolio-optimizer-excel-markowitz">Portfolio Optimizer Excel — Frontiera Efficiente di Markowitz</a>.</p>
+<p>Se invece preferisci costruirtelo da solo, i passaggi sopra bastano: parti dall'esempio a due ETF, verifica che i tuoi numeri coincidano con quelli dell'articolo, e poi allarga a più titoli.</p>
+<footer class="muted"><a href="https://lollo3rd.github.io/gimso/privacy.html">Privacy</a></footer>
+</main>
+</body>
+</html>
