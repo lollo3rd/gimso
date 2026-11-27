@@ -12,5 +12,12 @@
   "description": "Se hai due, cinque o dieci ETF in portafoglio, prima o poi ti fai la domanda: i pesi che ho scelto hanno senso, o li ho messi a sentimento? Il modello med…",
   "date": "2026-11-27",
   "url": "https://lollo3rd.github.io/gimso/articles/frontiera-efficiente-in-excel-come-calcolarla-e-usarla-per.html"
+ },
+ {
+  "slug": "what-n-d1-and-n-d2-actually-mean-in-blackscholes-with-numbers-you-can",
+  "title": "What N(d1) and N(d2) actually mean in Black–Scholes (with numbers you can check)",
+  "description": "Most people meet the Black–Scholes formula as a line to memorize:",
+  "date": "2026-11-27",
+  "url": "https://lollo3rd.github.io/gimso/articles/what-n-d1-and-n-d2-actually-mean-in-blackscholes-with-numbers-you-can.html"
  }
 ]

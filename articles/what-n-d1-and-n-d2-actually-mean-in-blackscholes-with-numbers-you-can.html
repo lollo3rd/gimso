@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What N(d1) and N(d2) actually mean in Black–Scholes (with numbers you can check) — GIMSO</title>
+<meta name="description" content="Most people meet the Black–Scholes formula as a line to memorize:">
+<link rel="canonical" href="https://lollo3rd.github.io/gimso/articles/what-n-d1-and-n-d2-actually-mean-in-blackscholes-with-numbers-you-can.html">
+<style>body{margin:0;background:#F5F2E9;color:#142F34;font:18px/1.65 system-ui,-apple-system,'Segoe UI',sans-serif}main{max-width:700px;margin:0 auto;padding:32px 16px 64px}header a{color:#142F34;font-weight:800;text-decoration:none;letter-spacing:.04em}h1{font-size:1.9rem;line-height:1.2;margin:24px 0 6px}h2{font-size:1.3rem;margin:32px 0 8px}h3,h4{font-size:1.1rem;margin:24px 0 6px}a{color:#176A61}.muted{color:#52686A;font-size:.92rem}code{background:#E8E4D8;padding:1px 4px;border-radius:4px}li{margin:4px 0}footer{margin-top:48px;border-top:1px solid #D5DFDA;padding-top:12px}.table{overflow-x:auto}table{border-collapse:collapse;font-size:.95rem;margin:12px 0}th,td{border-bottom:1px solid #D5DFDA;padding:6px 10px;text-align:left}th{background:#E8E4D8}</style>
+</head>
+<body>
+<main>
+<header><a href="https://lollo3rd.github.io/gimso/">GIMSO</a></header>
+<h1>What N(d1) and N(d2) actually mean in Black–Scholes (with numbers you can check)</h1>
+<p class="muted">November 27, 2026</p>
+<p>Most people meet the Black–Scholes formula as a line to memorize:</p>
+<p>C = S₀·N(d₁) − K·e^(−rT)·N(d₂)</p>
+<p>and then spend years half-remembering what N(d₁) and N(d₂) are. "N(d₁) is the delta." "N(d₂) is the probability the option ends in the money." Both statements are roughly right, and neither tells you <em>why the formula has this shape</em>.</p>
+<p>Here is the short answer, and then a worked example you can redo with a calculator:</p>
+<ul><li><strong>S₀·N(d₁) is a quantity of shares you hold.</strong> N(d₁) is how many shares you need per option.</li><li><strong>K·e^(−rT)·N(d₂) is cash you borrow.</strong> It is the size of the loan that, together with the shares, reproduces the option.</li><li><strong>The call price is the cost of that portfolio:</strong> shares bought minus money borrowed.</li></ul>
+<p>The formula is not "price = something times a probability". It is a shopping list.</p>
+<h3>The worked example</h3>
+<p>Take a plain European call on a stock that pays no dividends:</p>
+<div class="table"><table><thead><tr><th>Input</th><th>Value</th></tr></thead><tbody><tr><td>Stock price S₀</td><td>100</td></tr><tr><td>Strike K</td><td>100</td></tr><tr><td>Risk-free rate r</td><td>5% per year (continuous)</td></tr><tr><td>Volatility σ</td><td>20% per year</td></tr><tr><td>Time to expiry T</td><td>1 year</td></tr></tbody></table></div>
+<p><strong>Step 1 — d₁ and d₂.</strong></p>
+<p>d₁ = [ln(S₀/K) + (r + σ²/2)·T] / (σ·√T) = [0 + (0.05 + 0.02)·1] / 0.20 = <strong>0.35</strong></p>
+<p>d₂ = d₁ − σ·√T = 0.35 − 0.20 = <strong>0.15</strong></p>
+<p><strong>Step 2 — look them up in the normal table.</strong></p>
+<p>N(0.35) = <strong>0.6368</strong>   N(0.15) = <strong>0.5596</strong></p>
+<p><strong>Step 3 — the two pieces.</strong></p>
+<p>Shares: S₀·N(d₁) = 100 × 0.6368 = <strong>63.68</strong></p>
+<p>Loan: K·e^(−rT)·N(d₂) = 100 × 0.9512 × 0.5596 = <strong>53.23</strong></p>
+<p><strong>Step 4 — the price.</strong></p>
+<p>C = 63.68 − 53.23 = <strong>10.45</strong></p>
+<p>Now read the arithmetic again, but as instructions: <em>buy 0.6368 shares at 100 (cost 63.68), borrow 53.23, put in the remaining 10.45 of your own money.</em> That portfolio behaves like the call, for a small move and a short time, and its cost is the price of the call. Not because of an expected value, but because two things that pay the same must cost the same.</p>
+<h3>Why "shares plus a loan" is the right picture</h3>
+<p>The idea comes from the simplest possible model. Suppose a stock at 100 will be worth either 120 or 80 in one year, and you can borrow at 5% (annual, to keep it clean). A call with strike 100 pays 20 or 0.</p>
+<p>Hold Δ shares and borrow B. You want:</p>
+<ul><li>up: 120·Δ − 1.05·B = 20</li><li>down: 80·Δ − 1.05·B = 0</li></ul>
+<p>Subtract: 40·Δ = 20, so Δ = 0.5. Then B = 40 / 1.05 = 38.10. The portfolio costs 0.5 × 100 − 38.10 = <strong>11.90</strong>, and so must the call.</p>
+<p>Notice what is missing: the probability that the stock goes up. It never enters. Whether you think the up move is 10% or 90% likely, the replicating portfolio costs the same.</p>
+<p>Black–Scholes is this same calculation with more and more, shorter and shorter steps. In the limit, Δ becomes N(d₁) and the discounted loan becomes K·e^(−rT)·N(d₂). The structure never changes: <strong>some shares, some borrowed cash</strong>.</p>
+<h3>N(d₁): the hedge ratio, and why it moves</h3>
+<p>N(d₁) is the option's <strong>delta</strong>: how much the call price changes for a 1-unit move in the stock, and therefore how many shares you need to hedge one call.</p>
+<p>Watch it change with the stock price (same inputs, only S₀ moves):</p>
+<div class="table"><table><thead><tr><th>S₀</th><th>N(d₁) shares</th><th>N(d₂)</th><th>Loan</th><th>Call</th></tr></thead><tbody><tr><td>90</td><td>0.4298</td><td>0.3532</td><td>33.59</td><td>5.09</td></tr><tr><td>100</td><td>0.6368</td><td>0.5596</td><td>53.23</td><td>10.45</td></tr><tr><td>110</td><td>0.7958</td><td>0.7345</td><td>69.87</td><td>17.66</td></tr></tbody></table></div>
+<p>If the stock goes from 100 to 110, the replicating portfolio must go from 0.6368 to 0.7958 shares. You buy about 0.16 more shares, and you pay for them by <strong>borrowing more</strong> — the loan grows from 53.23 to 69.87. Stock up, buy more, borrow more. Stock down, sell, repay. This continuous rebalancing is exactly what an options desk does when it "delta hedges", and it is why the person who sold you the call doesn't need to guess where the market is going.</p>
+<p>A practical reading: if you are short 10 calls on a 100-share contract and delta is 0.6368, you need about 637 shares to be hedged. The number comes straight out of N(d₁).</p>
+<h3>N(d₂): the probability that is not quite a probability</h3>
+<p>N(d₂) is often described as "the probability that the call ends in the money". That is true with an important qualifier: <strong>under the risk-neutral measure</strong>, the made-up world in which every asset grows at the risk-free rate.</p>
+<p>In the example, N(d₂) = 0.5596. It does <em>not</em> say that the stock has a 56% real-world chance of finishing above 100. A stock with a higher expected return would have a higher real chance, and the call price would not change at all, exactly as in the two-outcome model.</p>
+<p>What N(d₂) does say, precisely, is this: K·e^(−rT)·N(d₂) is the present value of the strike you will pay, weighted by how often you would pay it in the risk-neutral world. That is why it sits next to the loan. When you exercise, you hand over K; the loan in the replicating portfolio is the hedge for that payment.</p>
+<h3>Why the two N's are different</h3>
+<p>If both pieces were "probability of exercise", why not one number? Because the two legs of the payoff are not equally sensitive to the outcome.</p>
+<ul><li>The cash leg pays K whenever the option is exercised, regardless of how far in the money. Only <em>whether</em> you exercise matters → N(d₂).</li><li>The share leg delivers a stock whose value is high precisely in the scenarios where you exercise. Exercise and a high share price go together → N(d₁), which is always larger than N(d₂) for σ &gt; 0.</li></ul>
+<p>The gap between them is σ·√T. With high volatility or long maturity, the gap widens; near expiry it shrinks.</p>
+<h3>Three sanity checks you can run in your head</h3>
+<p><strong>1. Deep in the money near expiry.</strong> S₀ = 130, K = 100, one month left. Both N(d₁) and N(d₂) are essentially 1, and the formula collapses to</p>
+<p>C ≈ 130 − 100 × e^(−0.05/12) = 130 − 99.58 = <strong>30.42</strong></p>
+<p>You hold one full share and owe the discounted strike: the call is just a leveraged stock position.</p>
+<p><strong>2. Far out of the money.</strong> S₀ = 100, K = 120, one year. N(d₁) = 0.2872, N(d₂) = 0.2231, call = 28.72 − 25.47 = <strong>3.25</strong>. Few shares, small loan, cheap option.</p>
+<p><strong>3. At the money, short dated.</strong> S₀ = K = 100, one month left. N(d₁) = 0.5402, N(d₂) = 0.5173, call = <strong>2.51</strong>. Both N's sit just above one half: an at-the-money option is close to a coin flip, and the hedge is about half a share.</p>
+<h3>The whole thing in 12 lines of Python</h3>
+<p>```python<br>from math import log, sqrt, exp, erf</p>
+<p>def N(x):<br>return 0.5 * (1 + erf(x / sqrt(2)))</p>
+<p>def bs_call(S, K, r, sigma, T):<br>d1 = (log(S / K) + (r + sigma**2 / 2) * T) / (sigma * sqrt(T))<br>d2 = d1 - sigma * sqrt(T)<br>shares = S * N(d1)<br>loan = K * exp(-r * T) * N(d2)<br>return shares - loan, N(d1), N(d2)</p>
+<p>print(bs_call(100, 100, 0.05, 0.20, 1.0))   # (10.4506..., 0.6368..., 0.5596...)<br>```</p>
+<p>No libraries beyond the standard one. Change S and watch N(d₁) and the loan move together.</p>
+<h3>What to take away</h3>
+<ul><li><strong>N(d₁)</strong> = shares per option = delta = the hedge.</li><li><strong>K·e^(−rT)·N(d₂)</strong> = the loan that finances those shares.</li><li><strong>N(d₂)</strong> is a probability only in the risk-neutral world; it is not a forecast.</li><li>The formula is the cost of a portfolio, which is why the real-world probability of the stock going up never appears.</li></ul>
+<p>If you want the full road from the two-outcome model to the closed form — every step with a number you can recompute, the Greeks as hedging questions, what 21 years of S&amp;P 500 data say about the normality assumption, and a tested Python file — that is what <a href="https://lollo3rd.gumroad.com/l/option-pricing-for-non-quants">Option Pricing for Non-Quants</a> is about. It is a 31-page book, written by the author of this article.</p>
+<p><em>Educational material only; not investment advice. All numbers are illustrative inputs, computed with the formulas shown.</em></p>
+<footer class="muted"><a href="https://lollo3rd.github.io/gimso/privacy.html">Privacy</a></footer>
+</main>
+</body>
+</html>
