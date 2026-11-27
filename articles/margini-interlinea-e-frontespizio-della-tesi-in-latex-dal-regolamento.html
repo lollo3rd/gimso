@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Margini, interlinea e frontespizio della tesi in LaTeX: dal regolamento dell&#x27;ateneo al codice — GIMSO</title>
+<meta name="description" content="Quasi ogni corso di laurea italiano ha un regolamento per la stesura della tesi: spesso un PDF di una o due pagine, scritto pensando a Word, che dice cose…">
+<link rel="canonical" href="https://lollo3rd.github.io/gimso/articles/margini-interlinea-e-frontespizio-della-tesi-in-latex-dal-regolamento.html">
+<style>body{margin:0;background:#F5F2E9;color:#142F34;font:18px/1.65 system-ui,-apple-system,'Segoe UI',sans-serif}main{max-width:700px;margin:0 auto;padding:32px 16px 64px}header a{color:#142F34;font-weight:800;text-decoration:none;letter-spacing:.04em}h1{font-size:1.9rem;line-height:1.2;margin:24px 0 6px}h2{font-size:1.3rem;margin:32px 0 8px}h3,h4{font-size:1.1rem;margin:24px 0 6px}a{color:#176A61}.muted{color:#52686A;font-size:.92rem}code{background:#E8E4D8;padding:1px 4px;border-radius:4px}li{margin:4px 0}footer{margin-top:48px;border-top:1px solid #D5DFDA;padding-top:12px}.table{overflow-x:auto}table{border-collapse:collapse;font-size:.95rem;margin:12px 0}th,td{border-bottom:1px solid #D5DFDA;padding:6px 10px;text-align:left}th{background:#E8E4D8}</style>
+</head>
+<body>
+<main>
+<header><a href="https://lollo3rd.github.io/gimso/">GIMSO</a></header>
+<h1>Margini, interlinea e frontespizio della tesi in LaTeX: dal regolamento dell&#x27;ateneo al codice</h1>
+<p class="muted">November 27, 2026</p>
+<p>Quasi ogni corso di laurea italiano ha un regolamento per la stesura della tesi: spesso un PDF di una o due pagine, scritto pensando a Word, che dice cose come «margine sinistro 3,5 cm», «interlinea 1,5», «carattere 12», «frontespizio conforme al facsimile». Chi scrive in LaTeX deve tradurre ognuna di queste frasi in una riga di codice, e le traduzioni sbagliate sono sempre le stesse.</p>
+<p>Questa guida prende le richieste più frequenti dei regolamenti e mostra, per ciascuna, il codice giusto e l'errore tipico. Funziona su Overleaf e in locale, con la classe <code>book</code> o <code>report</code> standard.</p>
+<h3>1. Il punto di partenza: la riga <code>\documentclass</code></h3>
+<p>Metà dei problemi di formato nasce qui, prima ancora di toccare i margini. Una base sensata per una tesi stampata e rilegata:</p>
+<p>```latex<br>\documentclass[12pt,a4paper,twoside,openright]{book}<br>```</p>
+<ul><li><code>12pt</code> — la dimensione del corpo del testo. Le classi standard accettano solo 10, 11 e 12 pt: se il regolamento chiede «carattere 12», è questa l'opzione.</li><li><code>a4paper</code> — senza, alcune installazioni usano il formato Letter americano, e tutti i margini risultano spostati di qualche millimetro.</li><li><code>twoside</code> — stampa fronte/retro. Se il regolamento chiede la stampa solo fronte, usa <code>oneside</code>: cambia il significato dei margini (vedi sotto).</li><li><code>openright</code> — ogni capitolo inizia su pagina dispari, a destra, come nei libri. Con <code>oneside</code> non ha effetto.</li></ul>
+<p>Se la tesi si consegna solo in PDF, <code>oneside</code> è quasi sempre la scelta più semplice: niente pagine bianche, margini simmetrici.</p>
+<h3>2. Margini e rilegatura</h3>
+<p>Il pacchetto da usare è <code>geometry</code>. L'errore più comune è scrivere <code>left</code> e <code>right</code> in un documento fronte/retro.</p>
+<p>In un documento <code>twoside</code> le pagine dispari e pari sono speculari: il margine verso la rilegatura sta a sinistra nelle pagine dispari e a destra nelle pari. Per questo <code>geometry</code> usa <code>inner</code> (lato rilegatura) e <code>outer</code> (lato esterno):</p>
+<p>```latex<br>\usepackage[a4paper, inner=3.5cm, outer=2.5cm, top=3cm, bottom=3cm]{geometry}<br>```</p>
+<p>Come leggere il regolamento:</p>
+<div class="table"><table><thead><tr><th>Il regolamento dice</th><th>Documento fronte/retro (<code>twoside</code>)</th><th>Documento solo fronte (<code>oneside</code>)</th></tr></thead><tbody><tr><td>«margine sinistro 3,5 cm»</td><td><code>inner=3.5cm</code></td><td><code>left=3.5cm</code></td></tr><tr><td>«margine destro 2,5 cm»</td><td><code>outer=2.5cm</code></td><td><code>right=2.5cm</code></td></tr><tr><td>«margine superiore e inferiore 3 cm»</td><td><code>top=3cm, bottom=3cm</code></td><td>uguale</td></tr><tr><td>«lasciare 1 cm per la rilegatura»</td><td><code>bindingoffset=1cm</code></td><td><code>bindingoffset=1cm</code></td></tr></tbody></table></div>
+<p>Attenzione all'ultima riga: <code>bindingoffset</code> si <strong>aggiunge</strong> al margine interno. Se il regolamento dice «margine sinistro 3,5 cm, comprensivo della rilegatura», scrivi <code>inner=3.5cm</code> e basta; se dice «margine 2,5 cm più 1 cm di rilegatura», scrivi <code>inner=2.5cm, bindingoffset=1cm</code>. Le due configurazioni producono la stessa pagina, ma sommare entrambe porta il margine a 4,5 cm.</p>
+<p>Un controllo rapido: aggiungi temporaneamente l'opzione <code>showframe</code> a <code>geometry</code>. LaTeX disegna i bordi dell'area del testo e puoi misurarli sul PDF stampato con un righello, che è esattamente ciò che farà la segreteria.</p>
+<h4>Esempio pratico</h4>
+<p>Regolamento: «formato A4, stampa fronte/retro, margini: sinistro 3 cm, destro 2 cm, superiore 2,5 cm, inferiore 2,5 cm». In un documento fronte/retro «sinistro» va letto come «lato rilegatura»:</p>
+<p>```latex<br>\documentclass[12pt,a4paper,twoside,openright]{book}<br>\usepackage[inner=3cm, outer=2cm, top=2.5cm, bottom=2.5cm]{geometry}<br>```</p>
+<p>Se nel dubbio non sai se «sinistro» significhi «interno», chiedi alla segreteria o guarda una tesi già rilegata in biblioteca: il margine largo sta sempre dal lato della costola.</p>
+<h3>3. Interlinea: perché <code>\linespread{1.5}</code> non è «interlinea 1,5»</h3>
+<p>Il regolamento scritto per Word dice «interlinea 1,5». La traduzione istintiva è <code>\linespread{1.5}</code>, ma produce un testo visibilmente più rado di quello che la commissione si aspetta: <code>\linespread</code> moltiplica la distanza tra le righe che LaTeX già usa, che è di per sé circa 1,2 volte il corpo del carattere.</p>
+<p>Il pacchetto <code>setspace</code> fa la conversione al posto tuo:</p>
+<p>```latex<br>\usepackage{setspace}<br>\onehalfspacing   % «interlinea 1,5»<br>% \doublespacing  % «interlinea doppia»<br>```</p>
+<p><code>\onehalfspacing</code> e <code>\doublespacing</code> scelgono il fattore giusto in base alla dimensione del carattere (10, 11 o 12 pt), in modo che il risultato corrisponda alla convenzione dattiloscritta a cui si riferiscono i regolamenti. In più, <code>setspace</code> lascia a interlinea singola le note a piè di pagina, le didascalie e le tabelle, che è quasi sempre ciò che si vuole.</p>
+<p>Se il regolamento chiede l'interlinea solo per il corpo del testo e non per bibliografia o citazioni lunghe, puoi racchiudere quelle parti in un ambiente <code>singlespace</code>:</p>
+<p>```latex<br>\begin{singlespace}<br>... citazione lunga ...<br>\end{singlespace}<br>```</p>
+<h3>4. Numerazione delle pagine: romani prima, arabi dopo</h3>
+<p>Molti regolamenti chiedono che indice, ringraziamenti e introduzione abbiano numeri romani, e che il primo capitolo riparta da 1. Con la classe <code>book</code> bastano tre comandi:</p>
+<p>```latex<br>\begin{document}<br>\frontmatter      % numeri romani, capitoli non numerati<br>% frontespizio, dedica, indice, sommario<br>\mainmatter       % numeri arabi da 1, capitoli numerati<br>% capitoli<br>\backmatter       % capitoli non numerati, numerazione continua<br>% bibliografia, ringraziamenti<br>\end{document}<br>```</p>
+<p>Con la classe <code>report</code> questi comandi non esistono: si usa <code>\pagenumbering{roman}</code> all'inizio e <code>\pagenumbering{arabic}</code> prima del primo capitolo.</p>
+<p>Il frontespizio non deve mostrare il numero di pagina: <code>\thispagestyle{empty}</code> sulla sua pagina.</p>
+<h3>5. Le pagine bianche con l'intestazione</h3>
+<p>Con <code>openright</code>, quando un capitolo finisce su una pagina dispari LaTeX inserisce una pagina bianca prima del successivo. Il difetto: quella pagina bianca mantiene intestazione e numero, e stampata sembra un errore.</p>
+<p>La soluzione è una riga:</p>
+<p>```latex<br>\usepackage{emptypage}<br>```</p>
+<p>Il pacchetto rende davvero vuote le pagine inserite automaticamente, senza toccare le altre.</p>
+<h3>6. Il frontespizio</h3>
+<p>Ogni ateneo ha il suo, e spesso c'è un facsimile da rispettare. La struttura tipica (ateneo, dipartimento, corso, titolo, candidato e relatore ai due lati, anno accademico) si costruisce con un ambiente <code>titlepage</code> e due <code>minipage</code> affiancate:</p>
+<p>```latex<br>\begin{titlepage}<br>\centering<br>{\large UNIVERSITÀ DEGLI STUDI DI ...\par}<br>\vspace{0.5cm}<br>{Dipartimento di ...\par}<br>{Corso di Laurea Magistrale in ...\par}<br>\vspace{3cm}<br>{\LARGE\bfseries Titolo della tesi\par}<br>\vfill<br>\begin{minipage}[t]{0.45\textwidth}<br>\raggedright<br>\textit{Relatore}\\<br>Prof.\ Nome Cognome\\[0.5cm]<br>\textit{Correlatore}\\<br>Dott.\ Nome Cognome<br>\end{minipage}\hfill<br>\begin{minipage}[t]{0.45\textwidth}<br>\raggedleft<br>\textit{Candidato}\\<br>Nome Cognome\\<br>Matricola 123456<br>\end{minipage}<br>\vspace{2cm}<br>{Anno Accademico 2025/2026\par}<br>\end{titlepage}<br>```</p>
+<p>Tre accorgimenti che fanno la differenza tra «somigliante» e «identico» al facsimile:</p>
+<ol><li><strong>Misura, non stimare.</strong> Stampa il facsimile e misura la distanza del titolo dal bordo superiore. Sostituisci il primo <code>\vfill</code> con <code>\vspace*{}</code> della misura esatta: le distanze elastiche cambiano appena il titolo va su due righe.</li><li><strong>Il titolo lungo.</strong> Se va a capo, decidi tu dove con <code>\\</code>: lasciarlo spezzare a LaTeX produce spesso un'ultima riga di una parola sola.</li><li><strong>Lo stemma.</strong> Usa il file vettoriale (PDF o SVG convertito in PDF) scaricato dal sito dell'ateneo, non uno screenshot: <code>\includegraphics[width=3cm]{stemma.pdf}</code>. Un PNG a bassa risoluzione stampato a 3 cm si vede sgranato. Gli stemmi sono marchi dell'ateneo: prendili dalla fonte ufficiale e verifica se il regolamento ne permette l'uso.</li></ol>
+<p>Se il facsimile è un PDF già pronto in cui vanno solo inseriti i dati, puoi anche compilarlo a parte e includerlo come prima pagina con il pacchetto <code>pdfpages</code>: <code>\includepdf{frontespizio.pdf}</code>.</p>
+<h3>7. Lingua, didascalie e date</h3>
+<p>Perché «Figure 1» diventi «Figura 1» e «Contents» diventi «Indice»:</p>
+<p>```latex<br>\usepackage[italian]{babel}<br>```</p>
+<p>Con pdfLaTeX aggiungi anche <code>\usepackage[T1]{fontenc}</code>, altrimenti le parole accentate non vengono sillabate correttamente e la copia-incolla dal PDF può restituire caratteri strani. Con XeLaTeX o LuaLaTeX <code>fontenc</code> non serve: i caratteri si gestiscono con <code>fontspec</code>.</p>
+<p>Se la tesi è in inglese ma il frontespizio deve restare in italiano, carica entrambe le lingue (<code>\usepackage[italian,english]{babel}</code>, l'ultima è quella principale) e scrivi il frontespizio dentro <code>\begin{otherlanguage}{italian} ... \end{otherlanguage}</code>.</p>
+<h3>Riepilogo: la tabella da tenere aperta</h3>
+<div class="table"><table><thead><tr><th>Il regolamento dice</th><th>In LaTeX</th></tr></thead><tbody><tr><td>carattere 12</td><td><code>\documentclass[12pt]{...}</code></td></tr><tr><td>formato A4</td><td>opzione <code>a4paper</code></td></tr><tr><td>stampa fronte/retro</td><td>opzione <code>twoside</code></td></tr><tr><td>capitoli su pagina dispari</td><td>opzione <code>openright</code> + pacchetto <code>emptypage</code></td></tr><tr><td>margine sinistro X cm (fronte/retro)</td><td><code>geometry</code>: <code>inner=X cm</code></td></tr><tr><td>margine per la rilegatura in più</td><td><code>geometry</code>: <code>bindingoffset=...</code></td></tr><tr><td>interlinea 1,5</td><td><code>setspace</code> + <code>\onehalfspacing</code></td></tr><tr><td>interlinea doppia</td><td><code>setspace</code> + <code>\doublespacing</code></td></tr><tr><td>numeri romani nelle pagine iniziali</td><td><code>\frontmatter</code> / <code>\mainmatter</code></td></tr><tr><td>frontespizio senza numero</td><td><code>\thispagestyle{empty}</code> o ambiente <code>titlepage</code></td></tr><tr><td>frontespizio da facsimile PDF</td><td><code>pdfpages</code> + <code>\includepdf</code></td></tr></tbody></table></div>
+<p>Con queste righe un preambolo minimale rispetta già la maggior parte dei regolamenti italiani. Il resto (stile delle citazioni, numerazione delle equazioni, elenco degli acronimi) dipende dal tuo corso e dal tuo relatore.</p>
+<p>Se preferisci partire da una base già pronta, ho raccolto tutto questo in un <a href="https://lollo3rd.gumroad.com/l/template-latex-tesi-italiana">template LaTeX per tesi, discussione e CV accademico</a>: una classe con frontespizio parametrico, un tema Beamer coordinato per la discussione e una guida che traduce le voci del regolamento in parametri, come nella tabella qui sopra. Si carica su Overleaf come zip e compila con pdfLaTeX, XeLaTeX e LuaLaTeX. Ma tutto quello che serve per farlo da soli è in questa pagina.</p>
+<footer class="muted"><a href="https://lollo3rd.github.io/gimso/privacy.html">Privacy</a></footer>
+</main>
+</body>
+</html>
